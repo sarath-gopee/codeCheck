@@ -42,6 +42,17 @@ public class customExceptionHandler {
         ErrorResponse error = new ErrorResponse("No Cabs are Available at the moment", details);
         return new ResponseEntity(error, HttpStatus.NOT_FOUND);
     }
+
+ @ExceptionHandler(cabNotFoundException.class)
+ public final ResponseEntity<Object> handleCabNotFoundException(cabNotFoundException ex)
+ {
+     List<String> details = new ArrayList<>();
+     details.add(ex.getLocalizedMessage());
+     ErrorResponse error = new ErrorResponse("Sorry the requested cab is unavailble right now. Please check again", details);
+     return new ResponseEntity(error, HttpStatus.NOT_FOUND);
+ }
+
+ 
  
 
 }

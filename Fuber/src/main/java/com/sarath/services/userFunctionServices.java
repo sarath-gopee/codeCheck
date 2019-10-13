@@ -1,5 +1,6 @@
 package com.sarath.services;
 
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -13,6 +14,7 @@ import java.util.List;
 import java.util.Map;
 
 import com.sarath.DAO.cabDAO;
+import com.sarath.exception.cabNotFoundException;
 import com.sarath.model.Location;
 import com.sarath.model.cabData;
 import com.sarath.model.customer;
@@ -81,19 +83,31 @@ public class userFunctionServices {
 	if(!listOfCars.isEmpty()) {
 		listOfCars.forEach(l -> {
 
-		Double x = userLocation.getLatitude() - l.getCabCurrLocation().getLatitude();
-		Double y = userLocation.getLongitude() - l.getCabCurrLocation().getLongitude();
-		Double distanceToUser = Math.hypot(x, y) * 108;// *108 to convert to kms
+		Double distanceToUser = this.calculateDistance(userLocation, l.getCabCurrLocation());
 
 		this.updateNearestCar(distanceToUser,l);
 	});
 	}
 	minDist = 0.0; // resetting for the next request
-	
+	logger.info("reset minDist ."  );
 	if(nearestCar == null) { throw new ClassNotFoundException();}
 	return nearestCar;
 			
 	
+	}
+	
+	// to find distance between two gps coordinates
+	public Double calculateDistance(Location l1, Location l2) {
+		Double distanceCalculated, x, y;
+		
+		x = l1.getLatitude() - l2.getLatitude();
+		y = l1.getLongitude() - l2.getLongitude();
+		distanceCalculated = Math.hypot(x, y) * 108;// *108 to convert to kms
+		
+		logger.info("distanceCalculated" +distanceCalculated);
+		
+		return distanceCalculated;
+		
 	}
 
 	// finds the nearest cab among nearby cabs
@@ -105,21 +119,48 @@ public class userFunctionServices {
 			nearestCar = car;
 	
 		}
+		
 	}
 	
-	public void bookCab(customer cust, Integer cabId) {
-		
+	public String bookCab(customer cust, Integer cabId) {
+		Double distancetocust;
 		cabData selectedCab = cabDAO.allCabs.get(cabId);
+		if(selectedCab.isCarAvailability()) { // to ensure that the cab is not booked by another customer
 		selectedCab.setCarAvailability(false);
 		selectedCab.setBookingStatus(true);
+		Location startingPoint = new Location(cust.getTripDetails().getStartPoint().getLatitude(),
+												cust.getTripDetails().getStartPoint().getLongitude());
+		Location endingPoint = new Location(cust.getTripDetails().getEndPoint().getLatitude(),
+				cust.getTripDetails().getEndPoint().getLongitude());
+
+		selectedCab.getUserData().getTripDetails().setStartPoint(startingPoint);
+		selectedCab.getUserData().getTripDetails().setEndPoint(endingPoint);
+		
 		
 		// as to reach the cab to the customer initial location
 		selectedCab.setCustLocation(cust.getCustCurrLocation()); 
 		
+
+		distancetocust = this.calculateDistance(cust.getCustCurrLocation(),selectedCab.getCabCurrLocation());
+		DecimalFormat f = new DecimalFormat("##.###");
+	     
 		
+		this.updateCarData(selectedCab);
+		
+		logger.info("cust location updated" + cabDAO.allCabs.get(selectedCab.getCabID()).getCabCurrLocation().getLatitude());
+		return f.format(distancetocust);
+		
+		
+		}
+		else throw new cabNotFoundException("Cab " + cabId);
+	}
+	
+	
+	//update the car data settings into the model.
+	public void updateCarData(cabData car) {
+		cabDAO.allCabs.put(car.getCabID(), car);
 		
 	}
-
-		
+	
 	}
 	

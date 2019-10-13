@@ -11,17 +11,15 @@ public class tripData {
 	private Location startPoint;
 	@Autowired
 	private Location endPoint;
-	private int tripFare;
-	private double tripDistance;
+	private Double tripFare;
+	private Double tripDistance;
 	private Date startTime;
 	private Date endTime;
 	
-	public tripData(Location startPoint, Location endPoint, int tripFare, double tripDistance) {
+	public tripData(Location startPoint, Location endPoint) {
 		super();
 		this.startPoint = startPoint;
-		this.endPoint = endPoint;
-		this.tripFare = tripFare;
-		this.tripDistance = tripDistance;
+		this.endPoint = endPoint;	
 	}
 	
 	public Location getStartPoint() {
@@ -36,16 +34,16 @@ public class tripData {
 	public void setEndPoint(Location endPoint) {
 		this.endPoint = endPoint;
 	}
-	public int getTripFare() {
+	public Double getTripFare() {
 		return tripFare;
 	}
-	public void setTripFare(int tripFare) {
+	public void setTripFare(Double tripFare) {
 		this.tripFare = tripFare;
 	}
 	public double getTripDistance() {
 		return tripDistance;
 	}
-	public void setTripDistance(double tripDistance) {
+	public void setTripDistance(Double tripDistance) {
 		this.tripDistance = tripDistance;
 	}
 	public Date getStartTime() {

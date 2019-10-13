@@ -4,25 +4,25 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 public class customer {
 
-	private Integer ID;
+	private Integer custID;
 	@Autowired
 	private Location custCurrLocation;
+
 	@Autowired
 	private tripData tripDetails;
 	
 	
 	public customer() {
 		super();
-		ID = 0;
 		Location loc = new Location(0.0,0.0);
 		this.custCurrLocation = loc;
-		this.tripDetails = new tripData(loc,loc,0,0.0);
+		this.tripDetails = new tripData(loc,loc);
 	}
-	public Integer getID() {
-		return ID;
+	public Integer getCustID() {
+		return custID;
 	}
-	public void setID(Integer iD) {
-		ID = iD;
+	public void setCustID(Integer custID) {
+		this.custID = custID;
 	}
 	public Location getCustCurrLocation() {
 		return custCurrLocation;
